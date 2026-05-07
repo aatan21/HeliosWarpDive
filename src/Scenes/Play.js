@@ -482,7 +482,7 @@ class Play extends Phaser.Scene {
                 if (boss.phase === 1 && boss.hp <= boss.maxHp / 2) {
                     boss.phase = 2;
                     boss.setTint(0xff5555); // Turn angry red
-                    boss.actionTimer = 60;  // Instantly reset timer for a fast attack
+                    boss.actionTimer = 0.5;  // Instantly reset timer for a fast attack
                 }
 
                 // Attack Timers
