@@ -16,9 +16,9 @@ class Play extends Phaser.Scene {
         this.asteroidSpeed = 150;
 
         // timers and cooldowns
-        this.bulletCooldown = 15; // Number of frames to wait before firing next bullet
+        this.bulletCooldown = 0.25;
         this.bulletCooldownCounter = 0;
-        this.asteroidSpawnRate = 120;
+        this.asteroidSpawnRate = 2.0;
         this.asteroidSpawnTimer = 0;
 
         // wave manager variables
@@ -27,8 +27,8 @@ class Play extends Phaser.Scene {
         this.pulseActive = false; // Is a pulse currently running?
         this.waveTransitioning = false; // Are we doing the hyperspace warp?
         
-        this.pulseDelay = 120;
-        this.pulseDelayCounter = 120; 
+        this.pulseDelay = 2.0;
+        this.pulseDelayCounter = 2.0; 
         this.asteroidsToSpawn = 0; // Tracks how many asteroids to drop per pulse
     }
 
@@ -301,7 +301,7 @@ class Play extends Phaser.Scene {
         // only allow shooting if alive
         if (my.sprite.player.active) {
             // Decrement the cooldown counter
-            this.bulletCooldownCounter--;
+            this.bulletCooldownCounter -= dt;
         };
         
 
@@ -379,12 +379,12 @@ class Play extends Phaser.Scene {
             if (this.pulseActive && activeAsteroids === 0 && activeFighters === 0 && bossActive === 0 && this.asteroidsToSpawn <= 0) {
                 this.pulseActive = false;
                 this.currentPulse++; // Move to next pulse
-                this.pulseDelayCounter = 120; // 2-second breather
+                this.pulseDelayCounter = 2.0; // 2-second breather
             }
 
             // If a pulse is not active, count down the breather delay, then trigger the next one
             if (!this.pulseActive) {
-                this.pulseDelayCounter--;
+                this.pulseDelayCounter -= dt;
 
                 if (this.pulseDelayCounter <= 0) {
                     this.pulseActive = true;
@@ -393,7 +393,7 @@ class Play extends Phaser.Scene {
                     if (this.currentPulse === 1) {
                         // Pulse 1: Warm-up Asteroids
                         this.asteroidsToSpawn = 5 + (this.currentWave * 2); // Drops more each wave
-                        this.asteroidSpawnRate = 60; // Faster spawns
+                        this.asteroidSpawnRate = 1.0; // Faster spawns
                     }
                     else if (this.currentPulse === 2) {
                         // Pulse 2: Fighter Formation
@@ -403,12 +403,12 @@ class Play extends Phaser.Scene {
                         // Pulse 3: Both Combined
                         this.spawnFighterFormation();
                         this.asteroidsToSpawn = 8 + (this.currentWave * 2);
-                        this.asteroidSpawnRate = 90; // Slower spawns to act as shields
+                        this.asteroidSpawnRate = 1.5; // Slower spawns to act as shields
                     }
                     else if (this.currentPulse === 4) {
                         // Pulse 4: Heavy Asteroid Shower
                         this.asteroidsToSpawn = 15 + (this.currentWave * 3);
-                        this.asteroidSpawnRate = 25; // Spawning very quickly
+                        this.asteroidSpawnRate = 0.4; // Spawning very quickly
                     }
                     else if (this.currentPulse === 5) {
                         // Pulse 5: BOSS BATTLE
@@ -423,7 +423,7 @@ class Play extends Phaser.Scene {
 
             // Handle the actual timed dropping of asteroids if we have some in the queue
             if (this.asteroidsToSpawn > 0) {
-                this.asteroidSpawnTimer--;
+                this.asteroidSpawnTimer -= dt;
                 if (this.asteroidSpawnTimer <= 0) {
                     let asteroid = this.my.sprite.asteroidGroup.getFirstDead();
                     if (asteroid != null) {
@@ -486,7 +486,7 @@ class Play extends Phaser.Scene {
                 }
 
                 // Attack Timers
-                boss.actionTimer--;
+                boss.actionTimer -= dt;
                 if (boss.actionTimer <= 0) {
                     if (boss.phase === 1) {
                         // PHASE 1: Spawn 2 diving minions directly from the boss
@@ -507,7 +507,7 @@ class Play extends Phaser.Scene {
                                 spawned++;
                             }
                         }
-                        boss.actionTimer = 180; // Wait 3 seconds before spawning more
+                        boss.actionTimer = 3.0; // Wait 3 seconds before spawning more
                     } 
                     else if (boss.phase === 2) {
                         // PHASE 2: Bullet Hell Spiral
@@ -533,7 +533,7 @@ class Play extends Phaser.Scene {
                         
                         // Shift the angle for the next burst to create a spiral effect
                         boss.spiralAngle += 0.2; 
-                        boss.actionTimer = 45; 
+                        boss.actionTimer = 1.5; 
                     }
                 }
             }
@@ -717,7 +717,7 @@ class Play extends Phaser.Scene {
                 } 
                 // State: Holding position and shooting
                 else if (enemy.state === 'holding') {
-                    enemy.holdTimer--;
+                    enemy.holdTimer -= dt;
                     
                     // Random chance to fire while holding
                     if (Phaser.Math.Between(0, 100) > 98) { 
@@ -806,7 +806,7 @@ class Play extends Phaser.Scene {
                 
                 // Stagger the hold timer so they dive sequentially (left to right)
                 // Each ship waits an extra 0.5 seconds before diving
-                enemy.holdTimer = 120 + (i * 30); 
+                enemy.holdTimer = 2.0 + (i * 0.5); 
                 
                 // Determine diving direction (-1 for left, 1 for right, 0 for middle)
                 enemy.diveDir = (enemy.x < 400) ? -1 : (enemy.x > 400 ? 1 : 0); 
@@ -841,7 +841,7 @@ class Play extends Phaser.Scene {
         boss.state = 'entering';
         boss.phase = 1;
         boss.moveDir = 1; // 1 for moving right, -1 for moving left
-        boss.actionTimer = 120; // 2 seconds before first attack
+        boss.actionTimer = 2.0; // 2 seconds before first attack
         boss.clearTint();
         boss.spiralAngle = 0;
     }
@@ -875,7 +875,7 @@ class Play extends Phaser.Scene {
                 // Reset Wave Variables for Increased Difficulty
                 this.currentWave++;
                 this.currentPulse = 1;
-                this.pulseDelayCounter = 120;
+                this.pulseDelayCounter = 2.0;
                 
                 // Teleport ship below the bottom of the screen
                 this.my.sprite.player.y = 1000; 
@@ -997,7 +997,7 @@ class Play extends Phaser.Scene {
         this.currentPulse = 1;
         this.pulseActive = false;
         this.waveTransitioning = false;
-        this.pulseDelayCounter = 120;
+        this.pulseDelayCounter = 2.0;
         this.asteroidsToSpawn = 0;         
         this.isGameOver = false;
     }
