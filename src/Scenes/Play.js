@@ -533,7 +533,7 @@ class Play extends Phaser.Scene {
                         
                         // Shift the angle for the next burst to create a spiral effect
                         boss.spiralAngle += 0.2; 
-                        boss.actionTimer = 1.5; 
+                        boss.actionTimer = 0.5; 
                     }
                 }
             }
